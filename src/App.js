@@ -11,17 +11,36 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    axios.get("https://pokeapi.co/api/v2/pokemon").then((res) => {
-      setLoading(false);
-      setNextPageUrl(res.data.next);
-      setPrevPageUrl(res.data.prev);
-      setPokemon(res.data.results.map((p) => p.name));
-    });
+    let cancel;
+    axios
+      .get(currentPageUrl, {
+        cancelToken: new axios.CancelToken((c) => (cancel = c)),
+      })
+      .then((res) => {
+        setLoading(false);
+        setNextPageUrl(res.data.next);
+        setPrevPageUrl(res.data.prev);
+        setPokemon(res.data.results.map((p) => p.name));
+      });
+    return () => cancel();
   }, [currentPageUrl]);
+
+  function gotoNextPage() {
+    setCurrentPageUrl(nextPageUrl);
+  }
+
+  function gotoPrevPage() {
+    setCurrentPageUrl(prevPageUrl);
+  }
 
   if (loading) return "Loading...";
 
-  return <PokemonList pokemon={pokemon} />;
+  return (
+    <>
+      <PokemonList pokemon={pokemon} />
+      <Pagination gotoNextPage={nextPageUrl ? gotoNextPage : null} gotoPrevPage={prevPageUrl ? gotoPrevPage : null} />
+    </>
+  );
 }
 
 export default App;
