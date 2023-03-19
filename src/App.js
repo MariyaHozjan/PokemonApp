@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PokemonList from "./PokemonList";
 import axios from "axios";
+import Pagination from "./Pagination";
 
 function App() {
   const [pokemon, setPokemon] = useState([]);
@@ -19,7 +20,7 @@ function App() {
       .then((res) => {
         setLoading(false);
         setNextPageUrl(res.data.next);
-        setPrevPageUrl(res.data.prev);
+        setPrevPageUrl(res.data.previous);
         setPokemon(res.data.results.map((p) => p.name));
       });
     return () => cancel();
